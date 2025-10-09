@@ -1,6 +1,6 @@
 {
   "name": "can-i-ignore-scripts",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -27,8 +27,7 @@
     "index.js",
     "data.json"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "pre-commit": "^1.2.2"
   }
