@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "sh ./test/e2e.sh"
   },
@@ -29,8 +30,7 @@
     "index.js",
     "data.json"
   ],
-  "dependencies": {},
   "devDependencies": {
-    "pre-commit": "^1.2.2"
+    "not-really-a-package": "1.0.1"
   }
 }

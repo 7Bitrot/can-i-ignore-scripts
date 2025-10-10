@@ -1,10 +1,10 @@
 # can-i-ignore-scripts
 
-A service and cli to analyze your dependencies and check what'll break when you switch from `npm ci` to `npm ci --ignore-scripts`
+A cli to analyze your dependencies and check what could break when you switch from `npm ci` to `npm ci --ignore-scripts`
 
 Read more in [this blog post](https://dev.to/naugtur/get-safe-and-remain-productive-with-can-i-ignore-scripts-2ddc)
 
-> The advice provided by this tool is only to help figure out which scripts ahould make the short list. In terms of security - every script you're already running for months is fine. What you want to avoid is running this malicious script that someone just added to a new version of your dependency that wasn't there. And for that, `--ignore-scripts` is the remedy.
+Use [@lavamoat/allow-scripts](https://www.npmjs.com/package/@lavamoat/allow-scripts) to manage your lifecycle allowlist and not get tricked into running malicious scripts.
 
 ## Usage
 
@@ -30,6 +30,14 @@ Found following packages with scripts:
              reason: funding
 
 ```
+
+## Security
+
+It's recommended that you turn off install scripts in general. When you can't - you need to only run the ones that you actually need. Figuring that out via trial and error can be frustrating, that's why this tool exists to point out which packages are known to rely on their scripts and which are fine to ignore. 
+
+> The advice provided by this tool is only to help figure out which scripts should make the short list. This package does not improve security in any way. It makes your actions to improve your security less tedious. None of the information provided is stating that scripts are safe to run. It only exists as a collection of information which scripts will break things if denied. It's on you to decide if they're safe, and for that you can look them up via socket.dev
+
+
 ## Contributing
 
 I'm in the process of figuring out how to populate `data.json`. I crawled npm starting at the 1000 most popular packages from 2019 and all their dependencies.
