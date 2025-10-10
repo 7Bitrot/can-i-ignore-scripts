@@ -6,7 +6,9 @@
   "scripts": {
     "test": "sh ./test/e2e.sh"
   },
-  "bin": "index.js",
+  "bin": {
+    "can-i-ignore-scripts": "index.js"
+  },
   "keywords": [
     "security",
     "postinstall",
