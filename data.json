@@ -91,6 +91,7 @@
         "@vscode/ripgrep": "downloads ripgrep builds to work"
     },
     "ignore": {
+        "@nestjs/core": "funding",
         "core-js": "funding",
         "core-js-pure": "funding",
         "ejs": "funding",
@@ -293,7 +294,6 @@
         "@fortawesome/fontawesome-pro": "todo",
         "@fortawesome/free-regular-svg-icons": "todo",
         "@microsoft/dynamicproto-js": "todo",
-        "@nestjs/core": "todo",
         "@newrelic/native-metrics": "todo",
         "@nrwl/angular": "todo",
         "@openapitools/openapi-generator-cli": "todo",
