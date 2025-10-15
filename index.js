@@ -2,6 +2,79 @@
 import fs from "node:fs";
 import util from "node:util";
 import { createInterface } from "node:readline/promises";
+import { readdir, stat, realpath } from "node:fs/promises";
+import { join } from "path";
+
+/**
+ * Recursively finds files, following symlinks and returning virtual paths.
+ * @param {string} dirPath - The current VIRTUAL path being searched.
+ * @param {string} fileNameToFind - The name of the file to find.
+ * @param {Set<string>} visitedPaths - A set of visited CANONICAL paths to prevent cycles.
+ * @returns {Promise<string[]>} A promise that resolves to an array of virtual file paths.
+ */
+async function findFilesRecursively(
+  dirPath,
+  fileNameToFind,
+  visitedPaths = new Set()
+) {
+  let results = [];
+
+  try {
+    // 1. Get the CANONICAL path for cycle detection ONLY.
+    const p = await realpath(dirPath);
+
+    // 2. Check if the canonical path has been visited to prevent infinite loops.
+    if (visitedPaths.has(p)) {
+      return []; // Stop this branch to prevent a cycle.
+    }
+    visitedPaths.add(p);
+
+    const entries = await readdir(dirPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      // 3. Construct the next VIRTUAL path for traversal and results.
+      const fullPath = join(dirPath, entry.name);
+
+      if (entry.isDirectory()) {
+        if (entry.name[0] === ".") {
+          // Skip hidden directories like .git, .svn, .hg, .cache, etc.
+          continue;
+        }
+        // Recurse using the virtual path.
+        results.push(
+          ...(await findFilesRecursively(
+            fullPath,
+            fileNameToFind,
+            visitedPaths
+          ))
+        );
+      } else if (entry.isSymbolicLink()) {
+        // ⛓️ For a symlink, check what it points to.
+        const linkStats = await stat(fullPath); // stat() follows the link.
+        if (linkStats.isDirectory()) {
+          // If it points to a directory, recurse using the virtual path.
+          results.push(
+            ...(await findFilesRecursively(
+              fullPath,
+              fileNameToFind,
+              visitedPaths
+            ))
+          );
+        }
+      } else if (entry.isFile() && entry.name === fileNameToFind) {
+        // 4. If we find a match, add the complete virtual path to our results.
+        results.push(fullPath);
+      }
+    }
+  } catch (err) {
+    // Silently ignore errors like broken symlinks or permission denied.
+    if (err.code !== "ENOENT" && err.code !== "EACCES") {
+      console.error(`Error processing path ${dirPath}:`, err);
+    }
+  }
+
+  return results;
+}
 
 const data = JSON.parse(
   fs.readFileSync(new URL("./data.json", import.meta.url))
@@ -33,7 +106,15 @@ console.log(`
 const cwdPkg = JSON.parse(fs.readFileSync("package.json"));
 const lavamoatPresent = !!cwdPkg.lavamoat?.allowScripts;
 
-const files = fs.globSync("node_modules/**/package.json");
+const locations = fs.globSync(["node_modules", "**/node_modules"]);
+console.log(`Looking in the following locations: 
+  ${locations.join('\n  ')}
+`);
+const files = (
+  await Promise.all(
+    locations.map((loc) => findFilesRecursively(loc, "package.json"))
+  )
+).flat();
 const found = files
   .map((file) => {
     let json;
@@ -83,7 +164,7 @@ ${lines.thin} ${Object.keys(found)
     } else if (data.keep[name]) {
       keep.push(name);
       return `
-[  keep  ] '${name}' needs its scripts to run
+[  keep  ] '${name}' may need its scripts to run
            ${lookup}
            reason: ${data.keep[name]} `;
     } else {
