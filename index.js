@@ -103,9 +103,6 @@ console.log(`
  ·▀▀▀  ▀  ▀ ▀▀ █▪   ▀▀▀   ▀▀▀ ·▀▀▀▀  ▀▀ █▪ ▀█▄▀▪.▀  ▀ ▀▀▀     ▀
 `);
 
-const cwdPkg = JSON.parse(fs.readFileSync("package.json"));
-const lavamoatPresent = !!cwdPkg.lavamoat?.allowScripts;
-
 const locations = fs.globSync(["node_modules", "**/node_modules"]);
 console.log(`Looking in the following locations: 
   ${locations.join('\n  ')}
@@ -189,61 +186,8 @@ ${util.inspect(found[name])}`;
   .reverse()
   .join(`\n${lines.thin}`)}`);
 
-if (lavamoatPresent) {
-  console.log(`
-${lines.thick}
-What now?`);
-  if (keep.length > 0) {
-    const pending = keep.filter((pkg) => !cwdPkg.lavamoat.allowScripts[pkg]);
-    if (pending.length > 0) {
-      const answer = await rl.question(
-        `
-You have ${
-          pending.length
-        } packages identified as 'keep' that are not yet allowed.
-  ${pending.join(",\n  ")}
-Would you like to populate your lavamoat allowlist with these packages? (y/n) `
-      );
-      if (answer.toLowerCase() === "y") {
-        console.log("Populating lavamoat allowlist.");
-        pending.forEach((pkg) => {
-          cwdPkg.lavamoat.allowScripts[pkg] = true;
-        });
-        fs.writeFileSync(
-          "package.json",
-          JSON.stringify(cwdPkg, null, 2) + "\n"
-        );
-        console.log(
-          "lavamoat allowlist populated. Remember to review the changes and commit them."
-        );
-      } else {
-        console.log("Skipping lavamoat allowlist population.");
-      }
-    } else {
-      console.log(
-        "All 'keep' packages are already allowed in your lavamoat allowlist."
-      );
-    }
-  } else {
-    console.log(
-      "Review packages marked as 'check' and update your lavamoat allowlist in package.json."
-    );
-  }
-  if (check.length > 0) {
-    const pending = check.filter((pkg) => !cwdPkg.lavamoat.allowScripts[pkg]);
-    if (pending.length > 0) {
-      console.log(`
-You have ${
-        pending.length
-      } packages identified as 'check' that are not yet allowed.
-  ${pending.join(",\n  ")}
-Please review these packages and update your 
-lavamoat allowlist in package.json as needed.
-`);
-    }
-  }
-} else {
-  console.log(`
+
+console.log(`
 ${lines.thick}
 What now?
 
@@ -256,10 +200,8 @@ allow-scripts auto
 npm pkg set scripts.setup='npm ci && allow-scripts'
 ${lines.thin}
 
-can-i-ignore-scripts will help populate the allow list if you run it again after that.
-
 `);
-}
+
 
 console.log(
   "█▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█\n"

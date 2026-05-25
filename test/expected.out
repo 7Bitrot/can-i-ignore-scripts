@@ -35,8 +35,6 @@ allow-scripts auto
 npm pkg set scripts.setup='npm ci && allow-scripts'
 ______________________________________________________________________
 
-can-i-ignore-scripts will help populate the allow list if you run it again after that.
-
 
 █▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
 
