@@ -29,4 +29,4 @@ jobs:
         node-version: 26
         registry-url: 'https://registry.npmjs.org'
 
-    - run: npm whoami
+    - run: npm stage publish --provenance
